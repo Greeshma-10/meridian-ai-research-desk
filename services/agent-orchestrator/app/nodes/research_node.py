@@ -4,14 +4,14 @@ over HTTP — this node has NO knowledge of Chroma, BM25, or reranking
 internals. It only knows "send a query, get back ranked chunks."
 """
 import logging
-
+import os 
 import requests
 
 from app.state import AgentState
 
 logger = logging.getLogger(__name__)
 
-RETRIEVAL_SERVICE_URL = "http://localhost:8001"
+RETRIEVAL_SERVICE_URL = os.environ.get("RETRIEVAL_SERVICE_URL", "http://localhost:8001")
 
 
 def research_node(state: AgentState) -> AgentState:

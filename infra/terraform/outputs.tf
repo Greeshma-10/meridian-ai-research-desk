@@ -5,3 +5,7 @@ output "ecr_repository_urls" {
   description = "ECR repository URLs, one per service"
   value       = { for k, v in aws_ecr_repository.service : k => v.repository_url }
 }
+
+output "load_balancer_url" {
+  value = "http://${aws_lb.main.dns_name}"
+}

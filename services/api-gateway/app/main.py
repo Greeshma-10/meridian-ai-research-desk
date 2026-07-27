@@ -15,8 +15,9 @@ from pydantic import BaseModel
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+import os
 
-AGENT_ORCHESTRATOR_URL = "http://localhost:8003"
+AGENT_ORCHESTRATOR_URL = os.environ.get("AGENT_ORCHESTRATOR_URL", "http://localhost:8003")
 
 app = FastAPI(title="Meridian API Gateway")
 

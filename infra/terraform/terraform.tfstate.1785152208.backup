@@ -1,0 +1,126 @@
+{
+  "version": 4,
+  "terraform_version": "1.15.8",
+  "serial": 99,
+  "lineage": "e62c171d-16ae-3cf6-39bc-721f5429335d",
+  "outputs": {},
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "aws_ecr_repository",
+      "name": "service",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "index_key": "api-gateway",
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ecr:us-east-1:162026158786:repository/meridian-api-gateway",
+            "encryption_configuration": [
+              {
+                "encryption_type": "AES256",
+                "kms_key": ""
+              }
+            ],
+            "force_delete": null,
+            "id": "meridian-api-gateway",
+            "image_scanning_configuration": [
+              {
+                "scan_on_push": true
+              }
+            ],
+            "image_tag_mutability": "MUTABLE",
+            "name": "meridian-api-gateway",
+            "registry_id": "162026158786",
+            "repository_url": "162026158786.dkr.ecr.us-east-1.amazonaws.com/meridian-api-gateway",
+            "tags": {
+              "Project": "meridian",
+              "Service": "api-gateway"
+            },
+            "tags_all": {
+              "Project": "meridian",
+              "Service": "api-gateway"
+            },
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjoxMjAwMDAwMDAwMDAwfX0="
+        },
+        {
+          "index_key": "ingestion-service",
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ecr:us-east-1:162026158786:repository/meridian-ingestion-service",
+            "encryption_configuration": [
+              {
+                "encryption_type": "AES256",
+                "kms_key": ""
+              }
+            ],
+            "force_delete": null,
+            "id": "meridian-ingestion-service",
+            "image_scanning_configuration": [
+              {
+                "scan_on_push": true
+              }
+            ],
+            "image_tag_mutability": "MUTABLE",
+            "name": "meridian-ingestion-service",
+            "registry_id": "162026158786",
+            "repository_url": "162026158786.dkr.ecr.us-east-1.amazonaws.com/meridian-ingestion-service",
+            "tags": {
+              "Project": "meridian",
+              "Service": "ingestion-service"
+            },
+            "tags_all": {
+              "Project": "meridian",
+              "Service": "ingestion-service"
+            },
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjoxMjAwMDAwMDAwMDAwfX0="
+        },
+        {
+          "index_key": "retrieval-service",
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ecr:us-east-1:162026158786:repository/meridian-retrieval-service",
+            "encryption_configuration": [
+              {
+                "encryption_type": "AES256",
+                "kms_key": ""
+              }
+            ],
+            "force_delete": null,
+            "id": "meridian-retrieval-service",
+            "image_scanning_configuration": [
+              {
+                "scan_on_push": true
+              }
+            ],
+            "image_tag_mutability": "MUTABLE",
+            "name": "meridian-retrieval-service",
+            "registry_id": "162026158786",
+            "repository_url": "162026158786.dkr.ecr.us-east-1.amazonaws.com/meridian-retrieval-service",
+            "tags": {
+              "Project": "meridian",
+              "Service": "retrieval-service"
+            },
+            "tags_all": {
+              "Project": "meridian",
+              "Service": "retrieval-service"
+            },
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjoxMjAwMDAwMDAwMDAwfX0="
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}

@@ -5,15 +5,19 @@ import logging
 
 import chromadb
 
+import os
+
 from app.chunker import Chunk
 
 logger = logging.getLogger(__name__)
 
 COLLECTION_NAME = "sec_filings"
 
+CHROMA_HOST = os.environ.get("CHROMA_HOST", "localhost")
+
 
 class VectorStore:
-    def __init__(self, host: str = "localhost", port: int = 8000) -> None:
+    def __init__(self, host: str = CHROMA_HOST, port: int = 8000) -> None:
         self.client = chromadb.HttpClient(host=host, port=port)
         self.collection = self.client.get_or_create_collection(COLLECTION_NAME)
 

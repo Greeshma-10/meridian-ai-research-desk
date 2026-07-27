@@ -14,7 +14,8 @@ from app.graph import build_graph
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-INGESTION_SERVICE_URL = "http://localhost:8002"
+import os
+INGESTION_SERVICE_URL = os.environ.get("INGESTION_SERVICE_URL", "http://localhost:8002")
 
 app = FastAPI(title="Meridian Agent Orchestrator")
 

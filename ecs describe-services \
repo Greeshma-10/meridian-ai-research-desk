@@ -1,0 +1,190 @@
+{
+    "service": {
+        "serviceArn": "arn:aws:ecs:us-east-1:162026158786:service/meridian-cluster/ingestion-service",
+        "serviceName": "ingestion-service",
+        "clusterArn": "arn:aws:ecs:us-east-1:162026158786:cluster/meridian-cluster",
+        "loadBalancers": [],
+        "serviceRegistries": [
+            {
+                "registryArn": "arn:aws:servicediscovery:us-east-1:162026158786:service/srv-7nr675p3fkd7s7he"
+            }
+        ],
+        "status": "ACTIVE",
+        "desiredCount": 1,
+        "runningCount": 1,
+        "pendingCount": 0,
+        "launchType": "FARGATE",
+        "platformVersion": "LATEST",
+        "platformFamily": "Linux",
+        "taskDefinition": "arn:aws:ecs:us-east-1:162026158786:task-definition/meridian-ingestion-service:1",
+        "deploymentConfiguration": {
+            "deploymentCircuitBreaker": {
+                "enable": false,
+                "rollback": false,
+                "resetOnHealthyTask": true,
+                "thresholdConfiguration": {
+                    "type": "BOUNDED_PERCENT",
+                    "value": 50
+                }
+            },
+            "maximumPercent": 200,
+            "minimumHealthyPercent": 100,
+            "strategy": "ROLLING",
+            "bakeTimeInMinutes": 0
+        },
+        "deployments": [
+            {
+                "id": "ecs-svc/7501170000847288190",
+                "status": "PRIMARY",
+                "taskDefinition": "arn:aws:ecs:us-east-1:162026158786:task-definition/meridian-ingestion-service:1",
+                "desiredCount": 0,
+                "pendingCount": 0,
+                "runningCount": 0,
+                "failedTasks": 0,
+                "createdAt": "2026-07-27T10:36:48.381000+00:00",
+                "updatedAt": "2026-07-27T10:36:48.381000+00:00",
+                "launchType": "FARGATE",
+                "platformVersion": "1.4.0",
+                "platformFamily": "Linux",
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-0e4141b1c94ee48f1",
+                            "subnet-05df3a42358239da7"
+                        ],
+                        "securityGroups": [
+                            "sg-03a3023b8f3665c2f"
+                        ],
+                        "assignPublicIp": "ENABLED"
+                    }
+                },
+                "rolloutState": "IN_PROGRESS",
+                "rolloutStateReason": "ECS deployment ecs-svc/7501170000847288190 in progress."
+            },
+            {
+                "id": "ecs-svc/0957511683775210627",
+                "status": "ACTIVE",
+                "taskDefinition": "arn:aws:ecs:us-east-1:162026158786:task-definition/meridian-ingestion-service:1",
+                "desiredCount": 1,
+                "pendingCount": 0,
+                "runningCount": 1,
+                "failedTasks": 0,
+                "createdAt": "2026-07-27T10:33:30.787000+00:00",
+                "updatedAt": "2026-07-27T10:35:40.158000+00:00",
+                "launchType": "FARGATE",
+                "platformVersion": "1.4.0",
+                "platformFamily": "Linux",
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-0e4141b1c94ee48f1",
+                            "subnet-05df3a42358239da7"
+                        ],
+                        "securityGroups": [
+                            "sg-03a3023b8f3665c2f"
+                        ],
+                        "assignPublicIp": "ENABLED"
+                    }
+                },
+                "rolloutState": "IN_PROGRESS",
+                "rolloutStateReason": "ECS deployment ecs-svc/0957511683775210627 in progress."
+            },
+            {
+                "id": "ecs-svc/0837938727110650755",
+                "status": "DRAINING",
+                "taskDefinition": "arn:aws:ecs:us-east-1:162026158786:task-definition/meridian-ingestion-service:1",
+                "desiredCount": 0,
+                "pendingCount": 0,
+                "runningCount": 0,
+                "failedTasks": 0,
+                "createdAt": "2026-07-27T10:25:22.366000+00:00",
+                "updatedAt": "2026-07-27T10:36:01.807000+00:00",
+                "launchType": "FARGATE",
+                "platformVersion": "1.4.0",
+                "platformFamily": "Linux",
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-0e4141b1c94ee48f1",
+                            "subnet-05df3a42358239da7"
+                        ],
+                        "securityGroups": [
+                            "sg-03a3023b8f3665c2f"
+                        ],
+                        "assignPublicIp": "ENABLED"
+                    }
+                },
+                "rolloutState": "COMPLETED",
+                "rolloutStateReason": "ECS deployment ecs-svc/0837938727110650755 completed."
+            }
+        ],
+        "roleArn": "arn:aws:iam::162026158786:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+        "events": [
+            {
+                "id": "29a457d2-5532-4f94-84be-9d52eeaba617",
+                "createdAt": "2026-07-27T10:35:40.214000+00:00",
+                "message": "(service ingestion-service) has stopped 1 running tasks: (task c4d977387667449293a175510b969955)."
+            },
+            {
+                "id": "ade393d5-052e-4ed1-9ae2-1299312e63fc",
+                "createdAt": "2026-07-27T10:33:48.217000+00:00",
+                "message": "(service ingestion-service) has started 1 tasks: (task 08290734f15049678e7a318f40898d09)."
+            },
+            {
+                "id": "f5a524bc-6e56-45ec-a64e-d1596993fc72",
+                "createdAt": "2026-07-27T10:26:25.256000+00:00",
+                "message": "(service ingestion-service) has reached a steady state."
+            },
+            {
+                "id": "addc1f7a-940a-4ff9-8617-e05923f2e868",
+                "createdAt": "2026-07-27T10:26:25.254000+00:00",
+                "message": "(service ingestion-service) (deployment ecs-svc/0837938727110650755) deployment completed."
+            },
+            {
+                "id": "07d7e7ec-2a61-4fd6-939b-9d5f64fca21a",
+                "createdAt": "2026-07-27T10:25:34.816000+00:00",
+                "message": "(service ingestion-service) has started 1 tasks: (task c4d977387667449293a175510b969955)."
+            }
+        ],
+        "createdAt": "2026-07-27T10:25:22.366000+00:00",
+        "currentServiceRevisions": [
+            {
+                "arn": "arn:aws:ecs:us-east-1:162026158786:service-revision/meridian-cluster/ingestion-service/7501170000847288190",
+                "requestedTaskCount": 0,
+                "runningTaskCount": 0,
+                "pendingTaskCount": 0
+            },
+            {
+                "arn": "arn:aws:ecs:us-east-1:162026158786:service-revision/meridian-cluster/ingestion-service/0957511683775210627",
+                "requestedTaskCount": 1,
+                "runningTaskCount": 1,
+                "pendingTaskCount": 0
+            },
+            {
+                "arn": "arn:aws:ecs:us-east-1:162026158786:service-revision/meridian-cluster/ingestion-service/0837938727110650755",
+                "requestedTaskCount": 0,
+                "runningTaskCount": 0,
+                "pendingTaskCount": 0
+            }
+        ],
+        "placementConstraints": [],
+        "placementStrategy": [],
+        "networkConfiguration": {
+            "awsvpcConfiguration": {
+                "subnets": [
+                    "subnet-0e4141b1c94ee48f1",
+                    "subnet-05df3a42358239da7"
+                ],
+                "securityGroups": [
+                    "sg-03a3023b8f3665c2f"
+                ],
+                "assignPublicIp": "ENABLED"
+            }
+        },
+        "healthCheckGracePeriodSeconds": 0,
+        "schedulingStrategy": "REPLICA",
+        "deploymentController": {
+            "type": "ECS"
+        },
+        "createdBy": "arn:aws:iam::162026158786:user/meridian-dev",
+       

@@ -2,6 +2,7 @@
 Wraps Chroma for storing and querying chunk embeddings.
 """
 import logging
+import os
 
 import chromadb
 
@@ -11,9 +12,14 @@ logger = logging.getLogger(__name__)
 
 COLLECTION_NAME = "sec_filings"
 
+# Read once at module level, used as the actual default below —
+# falls back to "localhost" for local dev, overridden to the Cloud Map
+# DNS name ("chroma.meridian.local") when running in ECS.
+CHROMA_HOST = os.environ.get("CHROMA_HOST", "localhost")
+
 
 class VectorStore:
-    def __init__(self, host: str = "localhost", port: int = 8000) -> None:
+    def __init__(self, host: str = CHROMA_HOST, port: int = 8000) -> None:
         self.client = chromadb.HttpClient(host=host, port=port)
         self.collection = self.client.get_or_create_collection(COLLECTION_NAME)
 

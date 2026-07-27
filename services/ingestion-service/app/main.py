@@ -21,7 +21,9 @@ from app.vector_store import VectorStore
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-RETRIEVAL_SERVICE_URL = "http://localhost:8001"
+import os
+
+RETRIEVAL_SERVICE_URL = os.environ.get("RETRIEVAL_SERVICE_URL", "http://localhost:8001")
 
 app = FastAPI(title="Meridian Ingestion Service")
 
