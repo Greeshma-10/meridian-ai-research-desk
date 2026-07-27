@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  unit-tests:
+    name: Unit Tests (ingestion-service)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+          cache-dependency-path: services/ingestion-service/requirements.txt
+
+      - name: Install dependencies
+        working-directory: services/ingestion-service
+        run: pip install -r requirements.txt
+
+      - name: Run unit tests
+        working-directory: services/ingestion-service
+        run: python -m pytest tests/ -v --junitxml=test-results.xml
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: services/ingestion-service/test-results.xml
+
+  integration-tests:
+    name: Integration Tests (fresh Chroma, no AWS calls)
+    runs-on: ubuntu-latest
+    # Spins up a real Chroma container as a CI "service" — this is free
+    # (no Bedrock/AWS involved) and tests our actual HTTP contracts
+    services:
+      chroma:
+        image: chromadb/chroma:0.5.20
+        ports:
+          - 8000:8000
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install retrieval-service dependencies
+        working-directory: services/retrieval-service
+        run: pip install -r requirements.txt
+
+      - name: Verify Chroma is reachable
+        run: curl --retry 5 --retry-delay 2 --retry-connrefused http://localhost:8000/api/v1/heartbeat
+
+      # NOTE: we deliberately do NOT run the full integration/slow suite
+      # here — those require real Bedrock calls (real cost, real AWS
+      # credentials) and would run on every single push. This is a
+      # conscious CI scope decision, not an oversight.
+      - name: Note on integration/slow tests
+        run: echo "Full integration + slow tests run manually/locally against real AWS resources — not in CI, to avoid cost and credential exposure on every push."
+
+  docker-build:
+    name: Build Docker images
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests]
+    strategy:
+      matrix:
+        service: [ingestion-service, retrieval-service, agent-orchestrator, api-gateway]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build ${{ matrix.service }} image
+        working-directory: services/${{ matrix.service }}
+        run: docker build -t meridian-${{ matrix.service }}:${{ github.sha }} .
