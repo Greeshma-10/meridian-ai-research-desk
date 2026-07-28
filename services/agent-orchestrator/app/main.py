@@ -32,7 +32,7 @@ class ResearchResponse(BaseModel):
     bear_thesis: str
     risk_assessment: str
     final_verdict: str
-
+    citation_verification: dict  # NEW
 
 @app.post("/research", response_model=ResearchResponse)
 def research(req: ResearchRequest) -> ResearchResponse:
@@ -57,6 +57,7 @@ def research(req: ResearchRequest) -> ResearchResponse:
         bear_thesis=result["bear_thesis"],
         risk_assessment=result["risk_assessment"],
         final_verdict=result["final_verdict"],
+        citation_verification=result["citation_verification"]
     )
 
 

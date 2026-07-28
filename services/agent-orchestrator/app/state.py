@@ -16,9 +16,9 @@ class ResearchChunk(TypedDict):
 class AgentState(TypedDict):
     ticker: str
     query: str
-
     research_chunks: list[ResearchChunk]
     bull_thesis: str
     bear_thesis: str
     risk_assessment: str
     final_verdict: str
+    citation_verification: dict  # NEW

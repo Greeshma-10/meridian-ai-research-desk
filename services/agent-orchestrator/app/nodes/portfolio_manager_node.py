@@ -13,13 +13,15 @@ SYSTEM_PROMPT = """You are the Portfolio Manager making the final call. You have
 thesis, a Bear thesis, and a Risk assessment. Your job is to weigh them honestly — do not just \
 pick the side that sounds more confident.
 
+When referencing a specific fact from the Bull, Bear, or Risk analysis, carry forward its \
+[chunk_id] citation rather than restating the claim without sourcing it.
+
 Structure your response EXACTLY as:
 VERDICT: [Bullish / Bearish / Neutral]
 CONFIDENCE: [Low / Medium / High]
 REASONING: [2-3 paragraphs explaining how you weighed the disagreement between Bull and Bear, \
 and what the Risk assessment changes about your view. Explicitly name where you think Bull or \
 Bear overstated their case, if applicable.]"""
-
 
 def portfolio_manager_node(state: AgentState) -> AgentState:
     logger.info("[Portfolio Manager] Synthesizing final verdict")
