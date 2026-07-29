@@ -1,27 +1,29 @@
+
+
+Readme · MD
 # Meridian — Multi-Agent AI Investment Research Platform
-
+ 
 Meridian is an AI-powered research desk that answers investment questions about publicly traded companies by retrieving real SEC filings, then running a structured, adversarial debate between four AI agents — Bull, Bear, Risk Manager, and Portfolio Manager — before returning a cited, verified verdict.
-
+ 
 Built from scratch as an end-to-end learning project covering RAG, multi-agent orchestration, microservice architecture, MLOps, CI/CD, and cloud infrastructure on AWS.
-
+ 
 > **Disclaimer:** This is a research/learning project, not a financial product. Nothing it produces is investment advice.
-
+ 
 ---
-
+ 
 ## What it actually does
-
+ 
 Ask a question like *"Should I be worried about Apple's competitive position?"* and Meridian:
-
+ 
 1. Fetches the company's real 10-K filing from SEC EDGAR (if not already cached)
 2. Breaks it into meaningfully-sized, section-aware chunks
 3. Retrieves the most relevant excerpts using hybrid search (semantic + keyword) and reranking
 4. Runs four AI agents in sequence: a **Bull** builds the strongest optimistic case, a **Bear** directly attacks the Bull's specific claims, a **Risk Manager** independently flags concrete dangers, and a **Portfolio Manager** weighs all three into a final verdict
 5. Verifies every citation the agents made against the real source text, catching fabricated or unsupported claims before returning the answer
-
 ---
-
+ 
 ## Architecture
-
+ 
 ```
 Browser
    │
@@ -39,13 +41,13 @@ agent-orchestrator  (LangGraph state machine)
    Research → Bull → Bear → Risk → Portfolio Manager → Citation Verification
    (all four agent LLM calls via Amazon Bedrock / Nova)
 ```
-
+ 
 Each box above is an independently deployable microservice, containerized with Docker, communicating over HTTP — not shared code imports. Retrieval and ingestion each own their own responsibility; the orchestrator coordinates but doesn't know how retrieval works internally, and vice versa.
-
+ 
 ---
-
+ 
 ## Tech stack, and why each piece is there
-
+ 
 | Tool | Role in the pipeline |
 |---|---|
 | **FastAPI** | Every microservice's HTTP interface — lightweight, async, auto-validates request/response shapes via Pydantic |
@@ -66,78 +68,100 @@ Each box above is an independently deployable microservice, containerized with D
 | **AWS ECS/Fargate** | Runs the containerized services in the cloud, no server management |
 | **AWS Cloud Map** | Service discovery — lets containers find each other by DNS name instead of hardcoded addresses |
 | **pytest** | Unit tests (pure logic, e.g. chunking/section-splitting) and integration tests (real services, real HTTP calls) |
-
+ 
 ---
-
+ 
 ## Project structure
-
+ 
 ```
 meridian-ai-research-desk/
 ├── services/
-│   ├── ingestion-service/      # EDGAR fetch → parse → chunk → embed → store
-│   ├── retrieval-service/      # Hybrid search + reranking
-│   ├── agent-orchestrator/     # LangGraph multi-agent pipeline
-│   ├── api-gateway/            # Public entrypoint
-│   └── frontend/               # Simple HTML/JS demo UI
+│   ├── ingestion-service/       # EDGAR fetch → parse → chunk → embed → store
+│   ├── retrieval-service/       # Hybrid search + reranking
+│   ├── agent-orchestrator/      # LangGraph multi-agent pipeline
+│   ├── api-gateway/             # Public entrypoint, JWT auth
+│   ├── knowledge-graph-service/ # Entity/relationship extraction + Neo4j queries
+│   ├── frontend/                # Original simple HTML/JS demo UI
+│   └── frontend-react/          # Production-style React + TypeScript frontend
+├── experiments/
+│   └── lora-finetuning/        # Local LoRA fine-tuning demo (risk category classifier)
 ├── infra/
 │   ├── terraform/              # AWS infrastructure as code
-│   └── docker-compose.yml      # Local Chroma
+│   ├── docker-compose.yml      # Local Chroma + Prometheus + Grafana
+│   └── prometheus.yml          # Scrape config for api-gateway metrics
 ├── tests/
 │   └── integration/            # Cross-service tests against real running services
 ├── .github/workflows/ci.yml    # CI pipeline
 └── scripts/start_all.sh        # Convenience script to start all local services
 ```
-
+ 
+### Frontend (services/frontend-react)
+ 
+A React + TypeScript + Tailwind frontend, built as a real application rather than a demo page:
+ 
+- **JWT-based login** with protected routing — the dashboard is inaccessible without a valid token, mirroring the api-gateway auth built in the backend
+- **Analysis history**, persisted in localStorage, with click-to-reload past results
+- **Loading and error states** — including a specific message for the timeout case (new tickers take longer to ingest than cached ones)
+- **VerdictCard**: the Portfolio Manager's structured `VERDICT/CONFIDENCE/REASONING` output is parsed and rendered as a dedicated visual component — a large colored icon and label (📈 Bullish / 📉 Bearish / ⚖️ Neutral), a confidence meter, and collapsible reasoning — rather than shown as undifferentiated text
+- **Collapsible sections** for Bull/Bear/Risk, each showing a live citation trust-score badge even when collapsed
+- Auto-resolves the backend API URL from the current hostname, so it works correctly whether run locally or through a Codespaces forwarded port, without manual `.env` edits per session
+Run it with:
+```bash
+cd services/frontend-react
+npm install
+npm run dev -- --host 0.0.0.0
+```
+Demo login: `analyst` / `meridian123`
+ 
 ---
-
+ 
 ## Running it locally
-
+ 
 Requires Docker, Python 3.12, and AWS credentials with Bedrock access configured as environment variables.
-
+ 
 ```bash
 # Start Chroma + all 4 services
 bash scripts/start_all.sh
-
+ 
 # Verify everything's healthy
 curl http://localhost:8080/health
-
+ 
 # Run a real analysis
 curl -X POST http://localhost:8080/analyze \
   -H "Content-Type: application/json" \
   -d '{"ticker": "AAPL", "query": "What is Apples biggest competitive risk?"}'
 ```
-
+ 
 ## Deploying to AWS
-
+ 
 ```bash
 cd infra/terraform
 terraform init
 terraform plan -out=tfplan
 terraform apply tfplan
-
+ 
 # Get the public URL
 terraform output load_balancer_url
-
+ 
 # Tear down when done (Fargate bills per minute)
 terraform destroy
 ```
-
+ 
 ---
-
+ 
 ## Design decisions worth knowing about
-
+ 
 - **Adversarial agent sequencing is deliberate.** Bear sees Bull's output and is instructed to directly attack it, rather than both agents running blind and simultaneously — this counters LLMs' tendency toward sycophantic agreement and produces sharper, more useful disagreement.
 - **Citation verification is local and free**, not another LLM call — it catches fabricated citations with certainty (string matching against real retrieved chunks) and flags weakly-supported claims approximately (word-overlap scoring), rather than spending money to verify every claim semantically.
 - **No NAT Gateway in the AWS deployment** — services run in public subnets behind security groups instead, a conscious cost trade-off (NAT Gateways bill ~$32/month idle) appropriate for a personal-budget demo, not a production security posture.
 - **IAM permissions are intentionally broad** during this build phase (documented training-wheels approach), not least-privilege — a known, flagged simplification rather than an oversight.
 - **Retrieval is its own microservice, not a shared library**, specifically because it's core business logic with its own lifecycle — a lesson learned firsthand after an earlier attempt to share Python code directly between services created fragile, duplicated state.
-
 ---
-
+ 
 ## Beyond the core pipeline
-
+ 
 The following were added after the initial build, each using free-tier or self-hosted tools rather than paid cloud services:
-
+ 
 | Capability | How it's built |
 |---|---|
 | **Knowledge graph** | Neo4j AuraDB (free tier). Entities and relationships (competitors, risk categories) are extracted from risk-factor chunks via Nova, then stored as a graph — enabling multi-hop queries pure vector search can't answer, e.g. "what risk categories do Apple and Microsoft have in common?" |
@@ -146,7 +170,8 @@ The following were added after the initial build, each using free-tier or self-h
 | **Monitoring** | Prometheus (self-hosted, Docker) scrapes api-gateway's instrumented `/metrics` endpoint; Grafana dashboards visualize request rate and latency in real time |
 | **Least-privilege IAM** | The original broad `MeridianProjectFullAccess` policy (used deliberately as training wheels through the build) was replaced with a policy scoped to the actual, audited set of AWS actions the project uses — verified via a clean `terraform plan` against the narrowed permissions |
 | **Fine-tuning (LoRA)** | A local, CPU-only LoRA fine-tune of DistilBERT for risk-category classification (`experiments/lora-finetuning/`) — trains ~1.1% of the model's parameters, demonstrating the core mechanics and cost trade-off versus using an LLM API call for the same narrow task. Bedrock's native fine-tuning was evaluated and intentionally skipped, since serving a fine-tuned model there requires Provisioned Throughput — a per-hour cost with no meaningful free tier, not justified for this project's scope |
-
+ 
 ## What's genuinely still open
-
+ 
 No end-to-end automated eval suite for agent output quality (beyond citation verification), no OpenTelemetry distributed tracing across services, and the frontend is a functional but minimal demo UI rather than a polished production interface.
+ 
