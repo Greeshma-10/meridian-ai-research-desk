@@ -12,7 +12,9 @@ import requests
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-
+from fastapi import Depends
+from app.auth import authenticate_user, create_access_token, verify_token
+from pydantic import BaseModel as PydanticBaseModel
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 import os
@@ -30,7 +32,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+class LoginRequest(BaseModel):
+    username: str
+    password: str
 
+@app.post("/auth/login")
+def login(req: LoginRequest) -> dict:
+    user = authenticate_user(req.username, req.password)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    token = create_access_token(user["username"], user["role"])
+    return {"access_token": token, "token_type": "bearer", "role": user["role"]}
 
 class AnalyzeRequest(BaseModel):
     ticker: str
@@ -38,8 +50,8 @@ class AnalyzeRequest(BaseModel):
 
 
 @app.post("/analyze")
-def analyze(req: AnalyzeRequest) -> dict:
-    logger.info(f"Gateway received request: {req.ticker} - {req.query}")
+def analyze(req: AnalyzeRequest, user: dict = Depends(verify_token)) -> dict:
+    logger.info(f"Gateway received request from {user['username']}: {req.ticker} - {req.query}")
     try:
         response = requests.post(
             f"{AGENT_ORCHESTRATOR_URL}/research",
