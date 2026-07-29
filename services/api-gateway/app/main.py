@@ -18,10 +18,12 @@ from pydantic import BaseModel as PydanticBaseModel
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 import os
+from prometheus_fastapi_instrumentator import Instrumentator
 
 AGENT_ORCHESTRATOR_URL = os.environ.get("AGENT_ORCHESTRATOR_URL", "http://localhost:8003")
 
 app = FastAPI(title="Meridian API Gateway")
+Instrumentator().instrument(app).expose(app)
 
 # CORS: allows the frontend (served from a different port) to call this API
 # from the browser. Wide open ("*") is fine for local dev; a real deployment
