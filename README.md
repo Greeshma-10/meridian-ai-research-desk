@@ -134,6 +134,19 @@ terraform destroy
 
 ---
 
-## What's not built (honestly)
+## Beyond the core pipeline
 
-Knowledge graph layer, model fine-tuning, authentication/RBAC on the API, production-grade monitoring (Prometheus/OpenTelemetry dashboards), and a tightened least-privilege IAM policy are all still open — noted here rather than implied as complete.
+The following were added after the initial build, each using free-tier or self-hosted tools rather than paid cloud services:
+
+| Capability | How it's built |
+|---|---|
+| **Knowledge graph** | Neo4j AuraDB (free tier). Entities and relationships (competitors, risk categories) are extracted from risk-factor chunks via Nova, then stored as a graph — enabling multi-hop queries pure vector search can't answer, e.g. "what risk categories do Apple and Microsoft have in common?" |
+| **Citation verification** | Local, zero-cost check run after every agent debate: confirms every `[chunk_id]` an agent cites genuinely exists in the retrieved context (catching fabrication with certainty) and flags weakly-supported claims via word-overlap scoring (an approximate, honestly-limited heuristic — noted in code comments) |
+| **Authentication & RBAC** | JWT-based login on api-gateway, with `user`/`admin` roles. Protects `/analyze` from unauthenticated use, which also protects against unbounded Bedrock spend from an open endpoint |
+| **Monitoring** | Prometheus (self-hosted, Docker) scrapes api-gateway's instrumented `/metrics` endpoint; Grafana dashboards visualize request rate and latency in real time |
+| **Least-privilege IAM** | The original broad `MeridianProjectFullAccess` policy (used deliberately as training wheels through the build) was replaced with a policy scoped to the actual, audited set of AWS actions the project uses — verified via a clean `terraform plan` against the narrowed permissions |
+| **Fine-tuning (LoRA)** | A local, CPU-only LoRA fine-tune of DistilBERT for risk-category classification (`experiments/lora-finetuning/`) — trains ~1.1% of the model's parameters, demonstrating the core mechanics and cost trade-off versus using an LLM API call for the same narrow task. Bedrock's native fine-tuning was evaluated and intentionally skipped, since serving a fine-tuned model there requires Provisioned Throughput — a per-hour cost with no meaningful free tier, not justified for this project's scope |
+
+## What's genuinely still open
+
+No end-to-end automated eval suite for agent output quality (beyond citation verification), no OpenTelemetry distributed tracing across services, and the frontend is a functional but minimal demo UI rather than a polished production interface.
